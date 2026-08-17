@@ -5,5 +5,7 @@ test_screenshots/
 .cache/
 tested_models.json
 make_data.py
-generate_full_data.py
-test_responsive.py
+*.db
+*.db-shm
+*.db-wal
+server/data/*.db*

@@ -14,16 +14,18 @@ import type {
 } from '../types';
 import localDataRaw from '../data/questionsData.json';
 import { geminiAI } from '../services/geminiClient';
+import { authService } from '../services/authService';
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || '/api';
 
 // Load local bundled static dataset (100 Java, 100 Python, 100 PHP)
 const localQuestions: { java: any[]; python: any[]; php: any[] } = localDataRaw as any;
 
-// Helper to get local storage progress
+// Helper to get local storage progress scoped to active user
 function getLocalProgress(): Record<string, { status: 'solved' | 'unsolved' | 'attempted'; draft?: string; notes?: string }> {
   try {
-    const raw = localStorage.getItem('codegym_user_progress');
+    const user = authService.getCurrentUsername();
+    const raw = localStorage.getItem(`codegym_user_progress_${user}`);
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
@@ -32,7 +34,8 @@ function getLocalProgress(): Record<string, { status: 'solved' | 'unsolved' | 'a
 
 function saveLocalProgress(progress: Record<string, { status: 'solved' | 'unsolved' | 'attempted'; draft?: string; notes?: string }>) {
   try {
-    localStorage.setItem('codegym_user_progress', JSON.stringify(progress));
+    const user = authService.getCurrentUsername();
+    localStorage.setItem(`codegym_user_progress_${user}`, JSON.stringify(progress));
   } catch (e) {
     console.error('Failed to save to localStorage:', e);
   }
@@ -40,7 +43,8 @@ function saveLocalProgress(progress: Record<string, { status: 'solved' | 'unsolv
 
 function getLocalSubmissions(): Submission[] {
   try {
-    const raw = localStorage.getItem('codegym_submissions');
+    const user = authService.getCurrentUsername();
+    const raw = localStorage.getItem(`codegym_submissions_${user}`);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -49,9 +53,10 @@ function getLocalSubmissions(): Submission[] {
 
 function saveLocalSubmission(sub: Submission) {
   try {
+    const user = authService.getCurrentUsername();
     const subs = getLocalSubmissions();
     subs.unshift(sub);
-    localStorage.setItem('codegym_submissions', JSON.stringify(subs.slice(0, 100)));
+    localStorage.setItem(`codegym_submissions_${user}`, JSON.stringify(subs.slice(0, 100)));
   } catch (e) {
     console.error('Failed to save submission:', e);
   }

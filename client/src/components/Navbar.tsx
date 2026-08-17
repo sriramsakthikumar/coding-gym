@@ -6,8 +6,10 @@ import {
   Shuffle,
   ChevronDown,
   CheckCircle2,
+  LogIn,
 } from 'lucide-react';
 import type { Language, ProgressSummary } from '../types';
+import type { User } from '../services/authService';
 import { computeRating } from '../utils/rating';
 import { Logo } from './Logo';
 
@@ -18,6 +20,8 @@ interface NavbarProps {
   onLanguageChange: (lang: Language) => void;
   stats: ProgressSummary | null;
   onPickRandom: () => void;
+  currentUser: User | null;
+  onOpenAuth: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -27,6 +31,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLanguageChange,
   stats,
   onPickRandom,
+  currentUser,
+  onOpenAuth,
 }) => {
   const [showRatingDetails, setShowRatingDetails] = useState<boolean>(false);
   const rating = computeRating(stats);
@@ -95,7 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             ))}
           </div>
 
-          {/* Right Section: Rating & Solved Tracking + Random */}
+          {/* Right Section: Rating & Solved Tracking + Random + User Auth */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={onPickRandom}
@@ -204,6 +210,28 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </>
               )}
             </div>
+
+            {/* User Account / Sign In Button */}
+            {currentUser ? (
+              <button
+                onClick={onOpenAuth}
+                className="flex items-center gap-1.5 px-2.5 py-1 sm:py-1.5 bg-[#181920] hover:bg-zinc-800 text-zinc-200 border border-[#262832] hover:border-zinc-700 rounded-xl text-xs font-medium transition-colors cursor-pointer"
+                title={`Signed in as ${currentUser.username}`}
+              >
+                <div className="w-4 h-4 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-100 uppercase">
+                  {currentUser.username.charAt(0)}
+                </div>
+                <span className="max-w-[70px] sm:max-w-[100px] truncate">{currentUser.username}</span>
+              </button>
+            ) : (
+              <button
+                onClick={onOpenAuth}
+                className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-zinc-100 hover:bg-white text-zinc-900 rounded-xl text-xs font-semibold shadow-xs transition-all cursor-pointer"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline">Sign In</span>
+              </button>
+            )}
           </div>
         </div>
 

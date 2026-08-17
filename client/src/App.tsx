@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Navbar } from './components/Navbar';
 import { WorkoutWorkspace } from './pages/WorkoutWorkspace';
 import { ProblemsCatalog } from './pages/ProblemsCatalog';
+import { AuthModal } from './components/AuthModal';
 import type { ProgressSummary, Language } from './types';
 import { api } from './api';
+import { authService, type User } from './services/authService';
 
 const defaultStats: ProgressSummary = {
   profile: {
@@ -84,6 +86,10 @@ export function App() {
   const [activeProblemId, setActiveProblemId] = useState<string>(initial.problemId);
   const [stats, setStats] = useState<ProgressSummary>(defaultStats);
 
+  // Authentication State
+  const [currentUser, setCurrentUser] = useState<User | null>(() => authService.getCurrentUser());
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+
   // Sync route changes to URL hash & localStorage
   const syncRoute = useCallback((tab: 'workout' | 'catalog', problemId: string, lang: Language) => {
     let routePath = tab === 'workout' ? `workout/${problemId}` : `catalog/${lang}`;
@@ -118,7 +124,12 @@ export function App() {
 
   useEffect(() => {
     loadGlobalStats();
-  }, []);
+  }, [currentUser]);
+
+  const handleAuthChange = (user: User | null) => {
+    setCurrentUser(user);
+    loadGlobalStats();
+  };
 
   const handleOpenProblem = (problemId: string) => {
     setActiveProblemId(problemId);
@@ -134,7 +145,6 @@ export function App() {
 
   const handleLanguageChange = (lang: Language) => {
     setSelectedLanguage(lang);
-    // If current problem is not for the selected language, switch to problem 001 of that language
     let newProbId = activeProblemId;
     if (!activeProblemId.startsWith(lang)) {
       newProbId = `${lang}-001`;
@@ -162,7 +172,7 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-[#0f1013] text-zinc-300 flex flex-col font-sans selection:bg-zinc-700/50 selection:text-zinc-100">
-      {/* Streamlined Clean Navbar */}
+      {/* Streamlined Clean Navbar with Auth button */}
       <Navbar
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -170,12 +180,15 @@ export function App() {
         onLanguageChange={handleLanguageChange}
         stats={stats}
         onPickRandom={handlePickRandom}
+        currentUser={currentUser}
+        onOpenAuth={() => setShowAuthModal(true)}
       />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-3">
         {activeTab === 'workout' && (
           <WorkoutWorkspace
+            key={`${currentUser?.username || 'guest'}-${activeProblemId}`}
             problemId={activeProblemId}
             onSelectProblem={handleOpenProblem}
             onBackToCatalog={() => handleTabChange('catalog')}
@@ -187,6 +200,7 @@ export function App() {
 
         {activeTab === 'catalog' && (
           <ProblemsCatalog
+            key={`${currentUser?.username || 'guest'}-${selectedLanguage}`}
             onOpenProblem={handleOpenProblem}
             selectedLanguage={selectedLanguage}
             onLanguageChange={handleLanguageChange}
@@ -195,6 +209,14 @@ export function App() {
           />
         )}
       </main>
+
+      {/* User Sign In / Register Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        currentUser={currentUser}
+        onAuthChange={handleAuthChange}
+      />
     </div>
   );
 }

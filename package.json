@@ -1,0 +1,29 @@
+{
+  "name": "coding-gym",
+  "version": "1.0.0",
+  "description": "CodeGym - Personal 100% Offline Coding Practice Platform for Java, Python, and PHP",
+  "main": "server/src/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node server/src/index.js",
+    "client": "npm run --prefix client dev",
+    "seed": "node server/src/db/seedQuestions.js",
+    "build": "npm run --prefix client build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "coding-practice",
+    "offline-leetcode",
+    "java",
+    "python",
+    "php",
+    "spaced-repetition",
+    "gamification"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "concurrently": "^10.0.4"
+  }
+}

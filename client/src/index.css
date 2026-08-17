@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-primary: #121316;
+    --bg-secondary: #1a1b20;
+    --text-primary: #e2e4e9;
+    --text-secondary: #858997;
+    --border-color: #272930;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0f1013;
+  color: #d1d5db;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom muted scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #121316;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #272930;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f424e;
+}
+
+/* Monaco container adjustments */
+.monaco-editor, .monaco-editor .overflow-guard {
+  border-radius: 0.5rem;
+}
